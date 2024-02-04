@@ -1,0 +1,67 @@
+.table {
+    table-layout: fixed;
+}
+
+.name-col {
+    width: 20%;
+    /* Adjust as needed */
+    align-self: center;
+}
+
+.note-col {
+    width: 40%;
+    /* Adjust as needed */
+    align-self: center;
+}
+
+.other-col {
+    width: 5%;
+    /* Adjust as needed */
+    align-self: center;
+
+}
+
+.other-check {
+    width: 2%;
+    /* Adjust as needed */
+    align-self: center;
+}
+
+.name-col,
+.other-col,
+.note-col {
+    text-align: center;
+}
+
+/* Add this to make the inputs fill the table cell */
+.table input[type="text"] {
+    color: green;
+    width: 100%;
+}
+
+.chart-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* This will place space between the chart and the button */
+}
+
+#chart_div {
+    flex-grow: 1;
+    /* This will make the chart fill the available space */
+}
+
+#drawChartButton {
+    margin-left: 10px;
+    /* This adds some space between the chart and the button */
+}
+
+.content-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%; /* This will make the container take up the full width of the page */
+}
+
+.form-container, .chart-container {
+    width: 45%; /* Adjust as needed */
+}

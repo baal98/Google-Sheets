@@ -1,0 +1,57 @@
+﻿@model IList<IList<object>>
+
+<link rel="stylesheet" type="text/css" href="~/css/tables.css">
+
+<form method="post" data-spreadsheet-id="@ViewBag.SpreadsheetId" asp-controller="GoogleSheetsAPI"
+    asp-action="UpdateSheet" asp-route-spreadsheetId="@ViewBag.SpreadsheetId">
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="other-check"></th>
+                <th class="name-col">Име</th>
+                <th class="other-col">Графика</th>
+                <th class="name-col">E-mail</th>
+                <th class="name-col">Телефон</th>
+                <th class="other-col">Етап</th>
+                <th class="other-col">Сграда</th>
+                <th class="other-col">Ап.</th>
+                <th class="note-col">Забележка</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                <tr>
+                    <td class="other-check">
+                        <input type="checkbox" class="row-select" data-row-index="@i" />
+                    </td>
+                    @for (int j = 0; j < Model[i].Count; j++)
+                    {
+                        <td>
+                            <input type="text" name="values[@i][@j]" value="@Model[i][j]?.ToString()" />
+                        </td>
+                    }
+                    <td>
+                        <button type="button" class="deleteRow" onclick="deleteRow(this)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <button id="addRow">Add Row</button>
+    <input type="submit" value="Запази промените" />
+    <button id="toggleButton">Show Chart</button>
+</form>
+
+<div class="content-container" style="display: none;">
+    <div class="form-container">
+        <div class="chart-container">
+            <div id="chart_div"></div>
+            <button id="drawChartButton">Show Chart</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="~/js/tables.js"></script>

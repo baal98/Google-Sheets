@@ -1,0 +1,17 @@
+﻿@model List<CreateTableModel>
+
+<table>
+    <thead>
+        <tr>
+            @foreach (var columnName in Model)
+            {
+                <th>@columnName.SpreadsheetId</th>
+                <th>@columnName.ColumnNames</th>
+                <th>@columnName.TableName</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Add your table rows here based on the data you have -->
+    </tbody>
+</table>
