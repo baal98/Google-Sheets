@@ -1,0 +1,50 @@
+﻿@model Google_Sheets.Models.CreateTableModel
+
+<form asp-action="CreateTable" method="post">
+    <div class="form-group">
+        <label for="TableName">Table Name</label>
+        <input type="text" class="form-control" id="TableName" name="TableName" required>
+    </div>
+    <div class="form-group">
+        <label for="NumberOfColumns">Number of Columns</label>
+        <input type="number" class="form-control" id="NumberOfColumns" name="NumberOfColumns" min="1" required>
+    </div>
+    <div class="form-group">
+        <label for="Description">Description</label>
+        <textarea class="form-control" id="Description" name="Description"></textarea>
+    </div>
+</form>
+
+
+<a class="btn btn-primary" href="#" id="createTableButton">Create New Table</a>
+
+<script>
+    document.getElementById("createTableButton").addEventListener("click", function (e) {
+    e.preventDefault(); // Предотвратяваме стандартното действие на линка (навигация)
+
+    // Събираме данните от формата
+    var tableName = document.getElementById("TableName").value;
+    var numberOfColumns = document.getElementById("NumberOfColumns").value;
+    var description = document.getElementById("Description").value;
+
+    // Изпращаме POST заявка към съответния URL (заменете с URL към контролера и метода)
+    fetch("/Data/CreateTable", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json" // Определяме правилния Content-Type за вашата заявка
+            },
+            body: JSON.stringify({ TableName: tableName, NumberOfColumns: numberOfColumns, Description: description }) // Изпращаме данните от формата като JSON
+        })
+        .then(response => {
+            if (response.ok) {
+                // Обработване успешния отговор тук (ако е необходимо)
+                window.location.href = "/Data/AllTables"; // Redirect to AllTables view
+            } else {
+                // Обработване грешката тук (ако е необходимо)
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+});
+</script>

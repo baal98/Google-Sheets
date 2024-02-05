@@ -122,57 +122,39 @@ namespace Google_Sheets.Services
         }
 
 
-        public async Task<string> CreateNewSpreadsheet(string tableName, List<string> columnNames, string spreadsheetId)
+        public async Task<string> CreateNewSpreadsheet(string tableName, int NumberOfColumns, string Description)
         {
-            // Create a new spreadsheet with the specified title
+            // Създаване на нов Spreadsheet обект със специфично заглавие
             var spreadsheet = new Spreadsheet()
             {
                 Properties = new SpreadsheetProperties()
                 {
                     Title = tableName
-                }
-            };
-
-            // Генериране на текущата дата и час в желания формат (например: "yyyyMMddHHmmss")
-            string currentDateTime = DateTime.Now.ToString("yyyyMMddHHmmss");
-
-            // Създаване на уникално име на листа, включващо текущата дата и час
-            string sheetName = $"Sheet1_{currentDateTime}";
-
-            // Използване на уникалното име на листа при създаването на Sheet обекта
-            var sheet = new Sheet()
-            {
-                Properties = new SheetProperties()
+                },
+                Sheets = new List<Sheet>() // Добавете тази линия
                 {
-                    Title = sheetName // Уникалното име на листа
+                    new Sheet() // Създайте лист със заглавие
+                    {
+                        Properties = new SheetProperties()
+                        {
+                            Title = "Лист1" // Или използвайте уникално име за листа, както преди
+                        }
+                    }
                 }
             };
 
-
-            // Create header row with column names
-            var headerRow = new List<object>();
-            foreach (var columnName in columnNames)
-            {
-                headerRow.Add(columnName);
-            }
-
-            var dataRow = new List<IList<object>> { headerRow };
-            var valueRange = new ValueRange
-            {
-                Values = dataRow
-            };
-
-            // Add the header row to the sheet
-            var updateRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, "Sheet1!A1");
-            updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
-            await updateRequest.ExecuteAsync();
-
-            // Create the spreadsheet
+            // Създайте таблицата
             var createRequest = service.Spreadsheets.Create(spreadsheet);
             var createdSpreadsheet = await createRequest.ExecuteAsync();
 
-            return createdSpreadsheet.SpreadsheetId;
+            // Получаване на SpreadsheetId от създадената таблица
+            var newSpreadsheetId = createdSpreadsheet.SpreadsheetId;
+
+            // Тук добавете логика за актуализация на листа с началния ред с имена на колони, ако е необходимо
+
+            return newSpreadsheetId;
         }
+
 
     }
 }

@@ -1,0 +1,66 @@
+﻿@model IEnumerable<Google_Sheets.Data.Models.TableModel>
+
+<h2>All Tables</h2>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Table Name</th>
+        <th>Number of Columns</th>
+        <th>Description</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var table in Model)
+    {
+        <tr>
+            <td>@table.TableName</td>
+            <td>@table.NumberOfColumns</td>
+            <td>@table.Description</td>
+            <td>
+                <a asp-controller="Data" asp-action="Index" asp-route-id="@table.Id">View</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<a class="btn btn-primary" href="#" id="createTableButton">Create New Table</a>
+
+<script>
+    document.getElementById("createTableButton").addEventListener("click", function (e) {
+    e.preventDefault(); // Предотвратяваме стандартното действие на линка (навигация)
+
+    // Пренасочваме потребителя към CreateTable view
+    window.location.href = "/Data/CreateTable";
+});
+</script>
+@* <a class="btn btn-primary" href="#" id="createTableButton">Create New Table</a>
+
+<script>
+    document.getElementById("createTableButton").addEventListener("click", function (e) {
+        e.preventDefault(); // Предотвратяваме стандартното действие на линка (навигация)
+
+        // Изпращаме POST заявка към съответния URL (заменете с URL към контролера и метода)
+        fetch("/Data/CreateTable", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json" // Определяме правилния Content-Type за вашата заявка
+                },
+                body: JSON.stringify({}) // Тук добавете JSON данни, ако са необходими
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Обработване успешния отговор тук (ако е необходимо)
+                    location.reload(); // Refresh the page
+
+                } else {
+                    // Обработване грешката тук (ако е необходимо)
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+    });
+</script> *@

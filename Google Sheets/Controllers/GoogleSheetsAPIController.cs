@@ -104,8 +104,9 @@ namespace Google_Sheets.Controllers
                 var newTableModel = new TableModel
                 {
                     TableName = model.TableName,
-                    ColumnNames = model.ColumnNames,
-                    SpreadsheetId = null // Initialize to null, as it will be updated later
+                    NumberOfColumns = model.NumberOfColumns,
+                    SpreadsheetId = null, // Initialize to null, as it will be updated later
+                    Description = model.Description
                 };
 
                 // Save the new TableModel to your database (you will need to implement this)
@@ -117,7 +118,9 @@ namespace Google_Sheets.Controllers
                 var newTableId = newTableModel.SpreadsheetId;
 
                 // Create a new Google Sheet
-                var newSpreadsheetId = await _sheetsService.CreateNewSpreadsheet(model.TableName, model.ColumnNames, newTableId);
+                // Create a new Google Sheet
+                var newSpreadsheetId = await _sheetsService.CreateNewSpreadsheet(model.TableName, model.NumberOfColumns, model.Description);
+
 
                 // Update the newTableModel with the generated SpreadsheetId
                 newTableModel.SpreadsheetId = newSpreadsheetId;

@@ -1,6 +1,9 @@
-﻿using Google_Sheets.Data.Models;
+﻿using Google_Sheets.Data;
+using Google_Sheets.Data.Models;
+using Google_Sheets.Models;
 using Google_Sheets.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Google_Sheets.Controllers
 {
@@ -8,11 +11,16 @@ namespace Google_Sheets.Controllers
     {
         private readonly GoogleSheetsAPIService _googleSheetsService;
         private readonly IConfiguration _configuration;
+        private readonly ApplicationDbContext _context;
+        private readonly ILogger<GoogleSheetsAPIController> _logger;
 
-        public DataController(GoogleSheetsAPIService googleSheetsService, IConfiguration configuration)
+
+        public DataController(GoogleSheetsAPIService googleSheetsService, IConfiguration configuration, ApplicationDbContext context, ILogger<GoogleSheetsAPIController> logger)
         {
             _googleSheetsService = googleSheetsService;
             _configuration = configuration;
+            _context = context;
+            _logger = logger;
         }
 
         public IActionResult Index()
@@ -42,18 +50,56 @@ namespace Google_Sheets.Controllers
             }
         }
 
-        public IActionResult TableView()
+        public async Task<IActionResult> AllTables()
         {
-            // Retrieve the newTableModel data from TempData
-            var model = TempData["TableModelData"] as TableModel;
+            var tables = await _context.Tables.ToListAsync();
+            return View(tables);
+        }
 
-            if (model == null)
+        // Добавете метод за показване на формата за създаване на нова таблица
+        public IActionResult CreateTable()
+        {
+            return View();
+        }
+
+        [HttpPost("Data/CreateTable")]
+        public async Task<IActionResult> CreateTable([FromBody] CreateTableModel model)
+        {
+            if (!ModelState.IsValid)
             {
-                // Handle the case when TempData does not contain the expected data
-                return RedirectToPage("Error");
+                _logger.LogError($"Validation errors: {string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage))}");
+                return BadRequest(ModelState);
             }
 
-            return View(model);
+            _logger.LogInformation("Received a request to create a new Google Sheets table.");
+
+            try
+            {
+                // Създаване на нов Google Sheet и получаване на SpreadsheetId
+                var spreadsheetId = await _googleSheetsService.CreateNewSpreadsheet(model.TableName, model.NumberOfColumns, model.Description);
+
+                // Създаване на нов TableModel за съхранение в базата данни
+                var newTableModel = new TableModel
+                {
+                    TableName = model.TableName,
+                    NumberOfColumns = model.NumberOfColumns,
+                    SpreadsheetId = spreadsheetId,
+                    Description = model.Description
+                };
+
+                await _context.Tables.AddAsync(newTableModel);
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation($"Google Sheets table created successfully with ID: {spreadsheetId}.");
+
+                // Връщане на успешен резултат с информация за създадената таблица
+                return Ok(new { SpreadsheetId = spreadsheetId, TableModel = newTableModel });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating Google Sheets table.");
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
         }
 
 

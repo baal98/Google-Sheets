@@ -6,8 +6,9 @@
             @foreach (var columnName in Model)
             {
                 <th>@columnName.SpreadsheetId</th>
-                <th>@columnName.ColumnNames</th>
+                <th>@columnName.NumberOfColumns</th>
                 <th>@columnName.TableName</th>
+                <th>@columnName.Description</th>
             }
         </tr>
     </thead>
