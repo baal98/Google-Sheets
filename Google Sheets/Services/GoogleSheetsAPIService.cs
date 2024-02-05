@@ -122,6 +122,40 @@ namespace Google_Sheets.Services
         }
 
 
+        //public async Task<string> CreateNewSpreadsheet(string tableName, int NumberOfColumns, string Description)
+        //{
+        //    // Създаване на нов Spreadsheet обект със специфично заглавие
+        //    var spreadsheet = new Spreadsheet()
+        //    {
+        //        Properties = new SpreadsheetProperties()
+        //        {
+        //            Title = tableName
+        //        },
+        //        Sheets = new List<Sheet>() // Добавете тази линия
+        //        {
+        //            new Sheet() // Създайте лист със заглавие
+        //            {
+        //                Properties = new SheetProperties()
+        //                {
+        //                    Title = "Лист1" // Или използвайте уникално име за листа, както преди
+        //                }
+        //            }
+        //        }
+        //    };
+
+        //    // Създайте таблицата
+        //    var createRequest = service.Spreadsheets.Create(spreadsheet);
+        //    var createdSpreadsheet = await createRequest.ExecuteAsync();
+
+        //    // Получаване на SpreadsheetId от създадената таблица
+        //    var newSpreadsheetId = createdSpreadsheet.SpreadsheetId;
+
+        //    // Тук добавете логика за актуализация на листа с началния ред с имена на колони, ако е необходимо
+
+        //    return newSpreadsheetId;
+        //}
+
+
         public async Task<string> CreateNewSpreadsheet(string tableName, int NumberOfColumns, string Description)
         {
             // Създаване на нов Spreadsheet обект със специфично заглавие
@@ -131,13 +165,13 @@ namespace Google_Sheets.Services
                 {
                     Title = tableName
                 },
-                Sheets = new List<Sheet>() // Добавете тази линия
+                Sheets = new List<Sheet>()
                 {
-                    new Sheet() // Създайте лист със заглавие
+                    new Sheet()
                     {
                         Properties = new SheetProperties()
                         {
-                            Title = "Лист1" // Или използвайте уникално име за листа, както преди
+                            Title = tableName
                         }
                     }
                 }
@@ -150,11 +184,26 @@ namespace Google_Sheets.Services
             // Получаване на SpreadsheetId от създадената таблица
             var newSpreadsheetId = createdSpreadsheet.SpreadsheetId;
 
-            // Тук добавете логика за актуализация на листа с началния ред с имена на колони, ако е необходимо
+            // Създаване на начален ред с имена на колони
+            var headerRow = new List<object>();
+            for (int i = 0; i < NumberOfColumns; i++)
+            {
+                headerRow.Add($"Column{i + 1}"); // Имената на колоните ще бъдат Column1, Column2, и т.н.
+            }
+
+            // Създаване на ValueRange обект за актуализация
+            var valueRange = new ValueRange()
+            {
+                Values = new List<IList<object>>() { headerRow }
+            };
+
+            // Актуализация на листа с началния ред
+            var updateRequest = service.Spreadsheets.Values.Update(valueRange, newSpreadsheetId, $"{tableName}!A1");
+            updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+            await updateRequest.ExecuteAsync();
 
             return newSpreadsheetId;
         }
-
 
     }
 }

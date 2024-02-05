@@ -23,13 +23,48 @@ namespace Google_Sheets.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
+        //public IActionResult Index()
+        //{
+        //    var spreadsheetId = _configuration["GoogleSheets:SpreadsheetId"];
+        //    ViewBag.SpreadsheetId = spreadsheetId;
+        //    var range = "Лист1!A1:H";
+        //    var values = _googleSheetsService.GetValues(spreadsheetId, range);
+        //    int expectedColumnCount = 8; // Очакваният брой колони
+
+        //    if (values != null && values.Count > 0)
+        //    {
+        //        for (int i = 0; i < values.Count; i++)
+        //        {
+        //            while (values[i].Count < expectedColumnCount)
+        //            {
+        //                values[i].Add(null); // Добавяне null или празен низ за празни клетки
+        //            }
+        //        }
+        //        // Превръщане на values в модел и подаване към view
+        //        return View(values);
+        //    }
+        //    else
+        //    {
+        //        // Обработка на случая, когато няма данни
+        //        return View("Error");
+        //    }
+        //}
+
+        public IActionResult Index(string id)
         {
-            var spreadsheetId = _configuration["GoogleSheets:SpreadsheetId"];
+            // Намиране на таблицата въз основа на подаденото ID
+            var table = _context.Tables.FirstOrDefault(t => t.Id.ToString() == id);
+            if (table == null)
+            {
+                // Обработка на случая, когато таблицата не е намерена
+                return View("Error");
+            }
+
+            var spreadsheetId = table.SpreadsheetId;
             ViewBag.SpreadsheetId = spreadsheetId;
-            var range = "Лист1!A1:H";
+            var range = $"{table.TableName}!A1:H";
             var values = _googleSheetsService.GetValues(spreadsheetId, range);
-            int expectedColumnCount = 8; // Очакваният брой колони
+            int expectedColumnCount = table.NumberOfColumns; // Очакваният брой колони
 
             if (values != null && values.Count > 0)
             {
