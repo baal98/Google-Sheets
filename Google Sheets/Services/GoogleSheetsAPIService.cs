@@ -61,7 +61,7 @@ namespace Google_Sheets.Services
             return products;
         }
 
-        public async Task UpdateSpreadsheet(string spreadsheetId, IList<IList<object>> values)
+        public async Task UpdateSpreadsheet(string spreadsheetId, string spreadsheetName, IList<IList<object>> values)
         {
             // Ensure all values are simple types that can be serialized to JSON
             for (int i = 0; i < values.Count; i++)
@@ -76,7 +76,7 @@ namespace Google_Sheets.Services
                 }
             }
 
-            var range = "Лист1!A1:H";
+            var range = $"{spreadsheetName}!A1:H";
             var valueRange = new ValueRange { Values = values };
 
             try
@@ -94,9 +94,9 @@ namespace Google_Sheets.Services
             }
         }
 
-        public async Task DeleteRow(string spreadsheetId, int rowIndex)
+        public async Task DeleteRow(string spreadsheetId, string spreadsheetName, int rowIndex)
         {
-            var range = $"Лист1!A{rowIndex}:H{rowIndex}";
+            var range = $"{spreadsheetName}!A{rowIndex}:H{rowIndex}";
             var requestBody = new BatchUpdateSpreadsheetRequest
             {
                 Requests = new List<Request>
@@ -109,7 +109,7 @@ namespace Google_Sheets.Services
                             {
                                 SheetId = 0,
                                 Dimension = "ROWS",
-                                StartIndex = rowIndex - 1,
+                                StartIndex = 0,
                                 EndIndex = rowIndex
                             }
                         }

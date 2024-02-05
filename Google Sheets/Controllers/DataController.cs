@@ -61,7 +61,10 @@ namespace Google_Sheets.Controllers
             }
 
             var spreadsheetId = table.SpreadsheetId;
+            var spreadsheetName = table.TableName;
             ViewBag.SpreadsheetId = spreadsheetId;
+            ViewBag.SpreadsheetName = spreadsheetName;
+
             var range = $"{table.TableName}!A1:H";
             var values = _googleSheetsService.GetValues(spreadsheetId, range);
             int expectedColumnCount = table.NumberOfColumns; // Очакваният брой колони
@@ -76,7 +79,9 @@ namespace Google_Sheets.Controllers
                     }
                 }
                 // Превръщане на values в модел и подаване към view
-                return View(values);
+                var model = new SheetUpdateModel { Values = values, Name = spreadsheetName };
+
+                return View(model);
             }
             else
             {

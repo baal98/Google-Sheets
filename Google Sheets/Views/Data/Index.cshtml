@@ -1,9 +1,10 @@
-﻿@model IList<IList<object>>
+﻿@model SheetUpdateModel
 
 <link rel="stylesheet" type="text/css" href="~/css/tables.css">
 
-<form method="post" data-spreadsheet-id="@ViewBag.SpreadsheetId" asp-controller="GoogleSheetsAPI"
+<form method="post" data-spreadsheet-id="@ViewBag.SpreadsheetId" data-spreadsheet-name="@Model.Name" asp-controller="GoogleSheetsAPI"
     asp-action="UpdateSheet" asp-route-spreadsheetId="@ViewBag.SpreadsheetId">
+<input type="hidden" name="Name" value="@Model.Name" />
     <table class="table">
         <thead>
             <tr>
@@ -19,16 +20,18 @@
             </tr>
         </thead>
         <tbody>
-            @for (int i = 0; i < Model.Count; i++)
+        @if (Model.Values.Count > 0)
+        {
+            @for (int i = 0; i < Model.Values.Count; i++)
             {
                 <tr>
                     <td class="other-check">
-                        <input type="checkbox" class="row-select" data-row-index="@i" />
+                        <input type="checkbox" class="row-select" data-row-index="@i"/>
                     </td>
-                    @for (int j = 0; j < Model[i].Count; j++)
+                    @for (int j = 0; j < Model.Values[i].Count; j++)
                     {
                         <td>
-                            <input type="text" name="values[@i][@j]" value="@Model[i][j]?.ToString()" />
+                            <input type="text" name="Values[@i][@j]" value="@Model.Values[i][j]?.ToString()"/>
                         </td>
                     }
                     <td>
@@ -36,6 +39,7 @@
                     </td>
                 </tr>
             }
+        }
         </tbody>
     </table>
     <button id="addRow">Add Row</button>

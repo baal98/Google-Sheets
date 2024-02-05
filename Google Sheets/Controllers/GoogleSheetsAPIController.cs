@@ -55,7 +55,10 @@ namespace Google_Sheets.Controllers
 
             try
             {
-                await _sheetsService.UpdateSpreadsheet(spreadsheetId, model.Values);
+                // Use model.Name here
+                _logger.LogInformation($"Updating sheet with name: {model.Name}");
+
+                await _sheetsService.UpdateSpreadsheet(spreadsheetId, model.Name, model.Values);
                 _logger.LogInformation("Sheet updated successfully.");
                 return Ok("Sheet updated successfully.");
             }
@@ -72,11 +75,11 @@ namespace Google_Sheets.Controllers
         }
 
         [HttpDelete("delete/{spreadsheetId}/{rowIndex}")]
-        public async Task<IActionResult> DeleteRow(string spreadsheetId, int rowIndex)
+        public async Task<IActionResult> DeleteRow(string spreadsheetId, int rowIndex, [FromQuery] string spreadsheetName)
         {
             try
             {
-                await _sheetsService.DeleteRow(spreadsheetId, rowIndex);
+                await _sheetsService.DeleteRow(spreadsheetId, spreadsheetName, rowIndex);
                 _logger.LogInformation("Row deleted successfully.");
                 return Ok("Row deleted successfully.");
             }
@@ -86,6 +89,7 @@ namespace Google_Sheets.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+
 
         [HttpPost("CreateTable")]
         public async Task<IActionResult> CreateTable([FromBody] CreateTableModel model)
