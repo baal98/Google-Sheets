@@ -22,4 +22,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.26" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\img\" />
+  </ItemGroup>
+
 </Project>

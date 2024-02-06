@@ -2,22 +2,30 @@
 
 <link rel="stylesheet" type="text/css" href="~/css/tables.css">
 
+<style>
+    .container {
+        background-color: wheat;
+    }
+</style>
+
+<h1 style="text-align: center">@Model.Name</h1>
+
 <form method="post" data-spreadsheet-id="@ViewBag.SpreadsheetId" data-spreadsheet-name="@Model.Name" asp-controller="GoogleSheetsAPI"
-    asp-action="UpdateSheet" asp-route-spreadsheetId="@ViewBag.SpreadsheetId">
-<input type="hidden" name="Name" value="@Model.Name" />
+      asp-action="UpdateSheet" asp-route-spreadsheetId="@ViewBag.SpreadsheetId">
+    <input type="hidden" name="Name" value="@Model.Name" />
     <table class="table">
         <thead>
-            <tr>
-                <th class="other-check"></th>
-                <th class="name-col">Име</th>
-                <th class="other-col">Графика</th>
-                <th class="name-col">E-mail</th>
-                <th class="name-col">Телефон</th>
-                <th class="other-col">Етап</th>
-                <th class="other-col">Сграда</th>
-                <th class="other-col">Ап.</th>
-                <th class="note-col">Забележка</th>
-            </tr>
+        <tr>
+            <th class="other-check"></th>
+            <th class="name-col">Име</th>
+            <th class="other-col">Графика</th>
+            <th class="name-col">E-mail</th>
+            <th class="name-col">Телефон</th>
+            <th class="other-col">Етап</th>
+            <th class="other-col">Сграда</th>
+            <th class="other-col">Ап.</th>
+            <th class="note-col">Забележка</th>
+        </tr>
         </thead>
         <tbody>
         @if (Model.Values.Count > 0)
@@ -35,16 +43,19 @@
                         </td>
                     }
                     <td>
-                        <button type="button" class="deleteRow" onclick="deleteRow(this)">Delete</button>
+                        <button type="button" class="deleteRow btn-danger" onclick="deleteRow(this)">Delete</button>
                     </td>
                 </tr>
             }
         }
         </tbody>
     </table>
-    <button id="addRow">Add Row</button>
-    <input type="submit" value="Запази промените" />
-    <button id="toggleButton">Show Chart</button>
+    <div style="text-align: center; margin-top: 20px;">
+        <button type="button" id="addRow" class="btn" style="background-color: #4CAF50; color: white;">Add Row</button>
+        <input type="submit" value="Запази промените" class="btn" style="background-color: #008CBA; color: white;" />
+        <button type="button" id="toggleButton" class="btn" style="background-color: #f44336; color: white;">Show Chart</button>
+        <a href="@Url.Action("AllTables", "Data")" class="btn" style="background-color: #e7e7e7; color: black; text-decoration: none;">Back to All Tables</a>
+    </div>
 </form>
 
 <div class="content-container" style="display: none;">

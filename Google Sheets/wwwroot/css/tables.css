@@ -65,3 +65,25 @@
 .form-container, .chart-container {
     width: 45%; /* Adjust as needed */
 }
+
+
+
+
+/* Button specific styles */
+.btn-view, .btn-delete {
+    width: auto; /* Allows the button to size according to its content */
+    margin: 0 auto; /* Centers the button in the table cell if needed */
+    display: block; /* Ensures the button takes its own line if necessary */
+}
+
+/* Ensures inputs and buttons within table cells do not inherit the table's fixed layout constraints directly */
+.table td input[type="text"],
+.table td a.btn {
+    width: 95%; /* Slightly less than 100% to account for padding/margins */
+    margin: 5px 0; /* Adds a little space above and below within the cell */
+}
+
+/* Optional: Adjust the padding inside the buttons if they look too big or too small */
+.table td a.btn {
+    padding: 5px 10px; /* Adjusts padding inside the buttons for better fit */
+}

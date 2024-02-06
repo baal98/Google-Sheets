@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Net;
 using Google_Sheets.Data;
+using Google.Apis.Sheets.v4.Data;
 
 namespace Google_Sheets.Controllers
 {
@@ -77,16 +78,56 @@ namespace Google_Sheets.Controllers
         [HttpDelete("delete/{spreadsheetId}/{rowIndex}")]
         public async Task<IActionResult> DeleteRow(string spreadsheetId, int rowIndex, [FromQuery] string spreadsheetName)
         {
+            // Намиране на SheetId
+            var sheetId = await _sheetsService.GetSheetIdFromName(spreadsheetId, spreadsheetName);
+            if (!sheetId.HasValue)
+            {
+                // Обработка на случая, когато SheetId не е намерен
+                return NotFound("Sheet not found.");
+            }
+
             try
             {
-                await _sheetsService.DeleteRow(spreadsheetId, spreadsheetName, rowIndex);
+                bool success = await _sheetsService.DeleteRow(spreadsheetId, spreadsheetName, rowIndex, sheetId);
+                if (!success)
+                {
+                    _logger.LogError("Failed to delete row.");
+                    return StatusCode(500, "Failed to delete row.");
+                }
+
                 _logger.LogInformation("Row deleted successfully.");
                 return Ok("Row deleted successfully.");
+            }
+            catch (GoogleApiException ex) when (ex.HttpStatusCode == HttpStatusCode.Forbidden)
+            {
+                _logger.LogWarning("Forbidden: You do not have permission to update this sheet.");
+                return Forbid("You do not have permission to update this sheet.");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting row.");
                 return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+        [HttpDelete("deletetable/{spreadsheetId}")]
+        public async Task<IActionResult> DeleteTable(string spreadsheetId)
+        {
+            // Locate the table record in the database using the SpreadsheetId
+            var table = _context.Tables.FirstOrDefault(t => t.SpreadsheetId == spreadsheetId);
+            if (table != null)
+            {
+                // Remove the table record from the database
+                _context.Tables.Remove(table);
+                await _context.SaveChangesAsync(); // Save changes to the database
+
+                _logger.LogInformation($"Database record for SpreadsheetId {spreadsheetId} deleted successfully.");
+                return Ok("Table record deleted successfully.");
+            }
+            else
+            {
+                _logger.LogWarning($"Database record for SpreadsheetId {spreadsheetId} not found.");
+                return NotFound("Database record not found.");
             }
         }
 
@@ -114,14 +155,12 @@ namespace Google_Sheets.Controllers
                 };
 
                 // Save the new TableModel to your database (you will need to implement this)
-                // You can generate a unique Id here or let the database generate it
                 await _context.Tables.AddAsync(newTableModel);
                 await _context.SaveChangesAsync();
 
                 // Now, you can retrieve the generated Id
                 var newTableId = newTableModel.SpreadsheetId;
 
-                // Create a new Google Sheet
                 // Create a new Google Sheet
                 var newSpreadsheetId = await _sheetsService.CreateNewSpreadsheet(model.TableName, model.NumberOfColumns, model.Description);
 
@@ -130,7 +169,6 @@ namespace Google_Sheets.Controllers
                 newTableModel.SpreadsheetId = newSpreadsheetId;
 
                 // Update the TableModel in your database with the new SpreadsheetId
-                // You will need to implement this
 
                 _logger.LogInformation("Google Sheets table created successfully.");
 

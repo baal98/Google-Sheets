@@ -1,0 +1,67 @@
+﻿/*Change Navigation Bar Color*/
+.navbar-custom {
+    background-color: midnightblue !important; /* Dark background */
+    border-color: #008cba !important; /* Slightly lighter dark shade for the border */
+}
+
+.navbar-custom .navbar-brand,
+.navbar-custom .nav-link {
+    color: gold !important; /* White text */
+}
+
+.navbar-custom .navbar-brand:hover,
+.navbar-custom .nav-link:hover {
+    color: aqua !important; /* Light gray hover effect */
+}
+
+
+
+/*Stylish Buttons with Hover Effect*/
+.btn {
+    background-color: #4CAF50; /* Green background */
+    color: gold; /* White text */
+    padding: 10px 24px; /* Some padding */
+    cursor: pointer; /* Pointer/hand icon */
+    border-radius: 5px; /* Rounded corners */
+    border: none; /* No borders */
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+}
+
+.btn:hover, .btn:focus {
+    background-color: #45a049; /* Darker shade of green */
+}
+
+/* Customize further based on button IDs or classes for different colors */
+#addRow {
+    background-color: #4CAF50; /* Green */
+}
+
+#addRow:hover {
+    background-color: #45a049; /* Darker green */
+}
+
+input[type="submit"] {
+    background-color: #008CBA; /* Blue */
+    color: white;
+}
+
+input[type="submit"]:hover {
+    background-color: #007B9E; /* Darker blue */
+}
+
+#toggleButton {
+    background-color: #f44336; /* Red */
+}
+
+#toggleButton:hover {
+    background-color: #da3830; /* Darker red */
+}
+
+a.btn {
+    background-color: gold; /* Gold */
+    color: black;
+}
+
+a.btn:hover {
+    background-color: coral; /* Coral */
+}

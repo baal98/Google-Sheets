@@ -36,6 +36,13 @@ namespace Google_Sheets.Services
             return response.Values;
         }
 
+        public async Task<int?> GetSheetIdFromName(string spreadsheetId, string spreadsheetName)
+        {
+            var spreadsheet = await service.Spreadsheets.Get(spreadsheetId).ExecuteAsync();
+            var sheet = spreadsheet.Sheets.FirstOrDefault(s => s.Properties.Title == spreadsheetName);
+            return sheet?.Properties.SheetId;
+        }
+
         public List<Product> GetSheetData()
         {
             var spreadsheetId = "your-spreadsheet-id";
@@ -94,68 +101,43 @@ namespace Google_Sheets.Services
             }
         }
 
-        public async Task DeleteRow(string spreadsheetId, string spreadsheetName, int rowIndex)
+        public async Task<bool> DeleteRow(string spreadsheetId, string spreadsheetName, int rowIndex, int? sheetId)
         {
-            var range = $"{spreadsheetName}!A{rowIndex}:H{rowIndex}";
-            var requestBody = new BatchUpdateSpreadsheetRequest
+            try
             {
-                Requests = new List<Request>
+                var range = $"{spreadsheetName}!A{rowIndex}:H{rowIndex}";
+                var requestBody = new BatchUpdateSpreadsheetRequest
                 {
-                    new Request
+                    Requests = new List<Request>
                     {
-                        DeleteDimension = new DeleteDimensionRequest
+                        new Request
                         {
-                            Range = new DimensionRange
+                            DeleteDimension = new DeleteDimensionRequest
                             {
-                                SheetId = 0,
-                                Dimension = "ROWS",
-                                StartIndex = 0,
-                                EndIndex = rowIndex
+                                Range = new DimensionRange
+                                {
+                                    SheetId = sheetId, // This should be dynamically obtained if possible
+                                    Dimension = "ROWS",
+                                    StartIndex = rowIndex - 1,
+                                    EndIndex = rowIndex
+                                }
                             }
                         }
                     }
-                }
-            };
+                };
 
-            var deleteRequest = service.Spreadsheets.BatchUpdate(requestBody, spreadsheetId);
-            await deleteRequest.ExecuteAsync();
+                var deleteRequest = service.Spreadsheets.BatchUpdate(requestBody, spreadsheetId);
+                await deleteRequest.ExecuteAsync();
+                return true; // Deletion was successful
+            }
+            catch (Exception ex)
+            {
+                // Log the exception here if necessary
+                return false; // Deletion failed
+            }
         }
 
-
-        //public async Task<string> CreateNewSpreadsheet(string tableName, int NumberOfColumns, string Description)
-        //{
-        //    // Създаване на нов Spreadsheet обект със специфично заглавие
-        //    var spreadsheet = new Spreadsheet()
-        //    {
-        //        Properties = new SpreadsheetProperties()
-        //        {
-        //            Title = tableName
-        //        },
-        //        Sheets = new List<Sheet>() // Добавете тази линия
-        //        {
-        //            new Sheet() // Създайте лист със заглавие
-        //            {
-        //                Properties = new SheetProperties()
-        //                {
-        //                    Title = "Лист1" // Или използвайте уникално име за листа, както преди
-        //                }
-        //            }
-        //        }
-        //    };
-
-        //    // Създайте таблицата
-        //    var createRequest = service.Spreadsheets.Create(spreadsheet);
-        //    var createdSpreadsheet = await createRequest.ExecuteAsync();
-
-        //    // Получаване на SpreadsheetId от създадената таблица
-        //    var newSpreadsheetId = createdSpreadsheet.SpreadsheetId;
-
-        //    // Тук добавете логика за актуализация на листа с началния ред с имена на колони, ако е необходимо
-
-        //    return newSpreadsheetId;
-        //}
-
-
+        
         public async Task<string> CreateNewSpreadsheet(string tableName, int NumberOfColumns, string Description)
         {
             // Създаване на нов Spreadsheet обект със специфично заглавие
@@ -177,7 +159,7 @@ namespace Google_Sheets.Services
                 }
             };
 
-            // Създайте таблицата
+            // Създаване таблицата
             var createRequest = service.Spreadsheets.Create(spreadsheet);
             var createdSpreadsheet = await createRequest.ExecuteAsync();
 
@@ -204,6 +186,7 @@ namespace Google_Sheets.Services
 
             return newSpreadsheetId;
         }
+
 
     }
 }

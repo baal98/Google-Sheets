@@ -4,63 +4,71 @@
 
 <table class="table">
     <thead>
-    <tr>
-        <th>Table Name</th>
-        <th>Number of Columns</th>
-        <th>Description</th>
-        <th>Actions</th>
-    </tr>
+        <tr>
+            <th>Table Name</th>
+            <th>Number of Columns</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
     </thead>
     <tbody>
-    @foreach (var table in Model)
-    {
-        <tr>
-            <td>@table.TableName</td>
-            <td>@table.NumberOfColumns</td>
-            <td>@table.Description</td>
-            <td>
-                <a asp-controller="Data" asp-action="Index" asp-route-id="@table.Id">View</a>
-            </td>
-        </tr>
-    }
+        @foreach (var table in Model)
+        {
+            <tr>
+                <td>@table.TableName</td>
+                <td>@table.NumberOfColumns</td>
+                <td>@table.Description</td>
+                <td>
+                    <a asp-controller="Data" asp-action="Index" asp-route-id="@table.Id" class="btn btn-view" style="background-color: #007bff; color: white; margin-right: 5px; display: inline-block; padding: 5px 10px; text-align: center; text-decoration: none; border-radius: 5px;">View</a>
+                    <a href="javascript:void(0);" class="btn btn-delete deleteButton" data-id="@table.SpreadsheetId" style="background-color: #dc3545; color: white; display: inline-block; padding: 5px 10px; text-align: center; text-decoration: none; border-radius: 5px;">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 
 <a class="btn btn-primary" href="#" id="createTableButton">Create New Table</a>
 
-<script>
-    document.getElementById("createTableButton").addEventListener("click", function (e) {
-    e.preventDefault(); // Предотвратяваме стандартното действие на линка (навигация)
-
-    // Пренасочваме потребителя към CreateTable view
-    window.location.href = "/Data/CreateTable";
-});
-</script>
-@* <a class="btn btn-primary" href="#" id="createTableButton">Create New Table</a>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     document.getElementById("createTableButton").addEventListener("click", function (e) {
         e.preventDefault(); // Предотвратяваме стандартното действие на линка (навигация)
 
-        // Изпращаме POST заявка към съответния URL (заменете с URL към контролера и метода)
-        fetch("/Data/CreateTable", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json" // Определяме правилния Content-Type за вашата заявка
-                },
-                body: JSON.stringify({}) // Тук добавете JSON данни, ако са необходими
-            })
-            .then(response => {
-                if (response.ok) {
-                    // Обработване успешния отговор тук (ако е необходимо)
-                    location.reload(); // Refresh the page
-
-                } else {
-                    // Обработване грешката тук (ако е необходимо)
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-            });
+        // Пренасочваме потребителя към CreateTable view
+        window.location.href = "/Data/CreateTable";
     });
-</script> *@
+
+    document.querySelectorAll('.deleteButton').forEach(button => {
+        button.addEventListener('click', function(e) {
+            var spreadsheetId = this.getAttribute('data-id'); // Get the Spreadsheet ID from the data-id attribute
+        
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Proceed with the deletion
+                    fetch(`/api/GoogleSheetsAPI/DeleteTable/${spreadsheetId}`, {
+                            method: 'DELETE'
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                // Handle successful deletion, e.g., refreshing the page or removing the table row from the DOM
+                                location.reload(); // Simple page reload to reflect changes
+                            } else {
+                                // Handle failure, e.g., show an error message
+                                Swal.fire('Error', 'There was a problem deleting the table.', 'error');
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                }
+            });
+        });
+    });
+</script>
